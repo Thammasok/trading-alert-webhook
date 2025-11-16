@@ -1,26 +1,43 @@
-# Trading Alert Webhook
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FSaltyAom%2Fvercel-function-elysia-demo)
 
-## Getting Started
+# Elysia with Vercel Function
 
-To get started with this template, simply paste this command into your terminal:
+Vercel Function support Web Standard Framework by default, so you can run Elysia on Vercel Function without any additional configuration.
 
-```bash
-cd trading-alert-webhook
+1. Create a file at **api/index.ts**
+2. In **index.ts**, create or import an existing Elysia server
+3. Export the Elysia server as default export
+
+```typescript
+import { Elysia, t } from 'elysia'
+
+export default new Elysia()
+    .get('/', () => 'Hello Vercel Function')
+    .post('/', ({ body }) => body, {
+        body: t.Object({
+            name: t.String()
+        })
+    })
 ```
 
-install
+4. Create `vercel.json` to rewrite the API route to Elysia server
 
-```bash
-bun install
+```json
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "rewrites": [
+		{
+			"source": "/(.*)",
+			"destination": "/api"
+		}
+    ]
+}
 ```
 
-## Development
+This configuration will rewrite all requests to the `/api` route, which is where Elysia server is defined.
 
-To start the development server run:
+No additional configuration is needed for Elysia to work with Vercel Function, as it supports the Web Standard Framework by default.
 
-```bash
+You can also use Elysia's built-in features like validation, error handling, [OpenAPI (scalar)](/plugins/swagger.html) and more, just like you would in any other environment.
 
-bun run dev
-```
-
-Open http://localhost:3000/ with your browser to see the result.
+For additional information, please refer to [Vercel Function documentation](https://vercel.com/docs/functions?framework=other).

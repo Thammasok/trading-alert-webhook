@@ -1,9 +1,12 @@
-import { Elysia } from 'elysia'
-import LineController from './line/line.controller'
-
-const LineCtr = new LineController()
+import { Elysia, t } from 'elysia'
+import { swagger } from '@elysiajs/swagger'
 
 export default new Elysia()
+  .use(swagger())
   .get('/', () => 'Hello Elysia!')
-  .get('/api/v1/webhook', (context) => LineCtr.webhook(context))
+  .post('/mirror', ({ body }) => body, {
+    body: t.Object({
+      name: t.String()
+    })
+  })
   .compile()
