@@ -1,4 +1,4 @@
-import { Context } from 'elysia'
+import type { Context } from 'elysia'
 
 export default class LineController {
   constructor() {}
