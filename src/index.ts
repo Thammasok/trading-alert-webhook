@@ -3,7 +3,12 @@ import LineController from './line/line.controller'
 
 const LineCtr = new LineController()
 
-const app = new Elysia().get('/api/v1/webhook', (context) => LineCtr.webhook(context))
+const app = new Elysia()
+
+app.get('/', () => {
+  return 'hello'
+})
+app.get('/api/v1/webhook', (context) => LineCtr.webhook(context))
 
 app.listen(3000)
 

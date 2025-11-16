@@ -4,8 +4,10 @@
   "module": "src/index.js",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "start": "./vercel/output",
-    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile vercel/output src/index.ts",
+    "start": "./dist/server",
+    "start:js": "bun ./dist/server.js",
+    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/index.ts",
+    "build:js": "bun build --minify-whitespace --minify-syntax --outfile dist/server.js src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
