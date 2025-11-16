@@ -3,13 +3,18 @@ import LineController from './line/line.controller'
 
 const LineCtr = new LineController()
 
-const app = new Elysia()
+export default new Elysia()
+  .get('/', () => 'Hello Elysia!')
+  .get('/api/v1/webhook', (context) => LineCtr.webhook(context))
+  .compile()
 
-app.get('/', () => {
-  return 'hello'
-})
-app.get('/api/v1/webhook', (context) => LineCtr.webhook(context))
+// const app = new Elysia()
 
-app.listen(3000)
+// app.get('/', () => {
+//   return 'hello'
+// })
+// app.get('/api/v1/webhook', (context) => LineCtr.webhook(context))
 
-console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`)
+// app.listen(3000)
+
+// console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`)
