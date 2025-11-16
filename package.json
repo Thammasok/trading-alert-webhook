@@ -1,13 +1,14 @@
 {
   "name": "trading-alert-webhook",
   "version": "0.1.0",
-  "module": "src/index.js",
+  "module": "index.ts",
+  "type": "module",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "start": "./dist/server",
-    "start:js": "bun ./dist/server.js",
-    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/index.ts",
-    "build:js": "bun build --minify-whitespace --minify-syntax --outfile dist/server.js src/index.ts",
+    "start:js": "bun ./dist/index.js",
+    "build:js": "bun build --minify-whitespace --minify-syntax --outfile dist/index.js src/index.ts",
+    "start:binary": "./dist/index",
+    "build:binary": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/index src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
