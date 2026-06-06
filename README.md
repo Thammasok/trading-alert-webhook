@@ -1,43 +1,137 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FSaltyAom%2Fvercel-function-elysia-demo)
+# Nutz Alert Bot
 
-# Elysia with Vercel Function
+TradingView → Telegram Alert Bot - A webhook server that receives trading alerts from TradingView and forwards them to Telegram.
 
-Vercel Function support Web Standard Framework by default, so you can run Elysia on Vercel Function without any additional configuration.
+## Features
 
-1. Create a file at **api/index.ts**
-2. In **index.ts**, create or import an existing Elysia server
-3. Export the Elysia server as default export
+- **Webhook Server**: Express-based server to receive TradingView alerts
+- **Telegram Integration**: Automatically sends formatted trading signals to Telegram
+- **Authentication**: Secret-based webhook authentication
+- **Risk-Reward Calculation**: Automatically calculates R:R ratio
+- **Keep-alive**: Built-in keep-alive for Render deployment
+- **Thai Language Support**: Messages formatted in Thai with Bangkok timezone
 
-```typescript
-import { Elysia, t } from 'elysia'
+## Installation
 
-export default new Elysia()
-    .get('/', () => 'Hello Vercel Function')
-    .post('/', ({ body }) => body, {
-        body: t.Object({
-            name: t.String()
-        })
-    })
+```bash
+# Install dependencies
+pnpm install
 ```
 
-4. Create `vercel.json` to rewrite the API route to Elysia server
+## Configuration
 
+Create a `.env` file based on `.env.example`:
+
+```env
+PORT=3000
+
+# Keep-alive for Render (optional)
+RENDER_URL=https://your-app.onrender.com
+
+# Webhook secret for signature verification
+WEBHOOK_SECRET=nutz-secret-change-me-2024
+
+# Telegram bot configuration
+TELEGRAM_TOKEN=your_bot_token_here
+TELEGRAM_CHAT_ID=your_chat_id_here
+```
+
+### Getting Telegram Credentials
+
+1. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram
+2. Copy the bot token to `TELEGRAM_TOKEN`
+3. Get your chat ID by messaging [@userinfobot](https://t.me/userinfobot) or using the API
+4. Copy the chat ID to `TELEGRAM_CHAT_ID`
+
+## Usage
+
+### Development
+
+```bash
+pnpm dev
+```
+
+### Production
+
+```bash
+# Build
+pnpm build
+
+# Start
+pnpm start
+```
+
+## API Endpoints
+
+### GET `/`
+Health check endpoint
+
+### GET `/health`
+Health check with timestamp
+
+### POST `/webhook`
+Receives TradingView webhook alerts
+
+**Headers:**
+- `x-webhook-secret`: Your webhook secret for authentication
+
+**Body:**
 ```json
 {
-    "$schema": "https://openapi.vercel.sh/vercel.json",
-    "rewrites": [
-		{
-			"source": "/(.*)",
-			"destination": "/api"
-		}
-    ]
+  "action": "BUY",
+  "symbol": "BTCUSDT",
+  "price": 77000,
+  "stop": 74500,
+  "tp1": 80000,
+  "tp2": 82500,
+  "timeframe": "4H",
+  "signal": "BOS Bullish + Volume Spike"
 }
 ```
 
-This configuration will rewrite all requests to the `/api` route, which is where Elysia server is defined.
+**Fields:**
+- `action` (required): "BUY", "SELL", or "INFO"
+- `symbol` (required): Trading pair symbol
+- `price` (required): Entry price
+- `stop` (optional): Stop loss price
+- `tp1` (optional): Take profit 1
+- `tp2` (optional): Take profit 2
+- `timeframe` (optional): Timeframe (default: "4H")
+- `signal` (optional): Additional signal description
 
-No additional configuration is needed for Elysia to work with Vercel Function, as it supports the Web Standard Framework by default.
+### POST `/test`
+Sends a test alert to Telegram (no authentication required)
 
-You can also use Elysia's built-in features like validation, error handling, [OpenAPI (scalar)](/plugins/swagger.html) and more, just like you would in any other environment.
+## TradingView Setup
 
-For additional information, please refer to [Vercel Function documentation](https://vercel.com/docs/functions?framework=other).
+1. Go to your TradingView alert settings
+2. Set the webhook URL to: `https://your-server.com/webhook`
+3. Add the header: `x-webhook-secret: your-secret`
+4. Configure the alert message with JSON payload matching the webhook format
+
+Example TradingView alert message:
+```
+{"action": "{{strategy.order.action}}", "symbol": "{{ticker}}", "price": {{close}}, "stop": {{strategy.order.sl}}, "tp1": {{strategy.order.tp}}, "timeframe": "{{interval}}"}
+```
+
+## Message Format
+
+The bot formats Telegram messages with:
+- Direction indicator (🟢 LONG / 🔴 SHORT / ⚪ INFO)
+- Symbol and timeframe
+- Entry price, stop loss, take profits
+- Risk-reward ratio calculation
+- Timestamp in Bangkok timezone
+- Thai language disclaimer
+
+## Deployment
+
+### Render
+The bot includes built-in keep-alive functionality for Render. Set `RENDER_URL` in your environment variables.
+
+### Other Platforms
+Deploy to any platform that supports Node.js. Ensure the port is configurable via the `PORT` environment variable.
+
+## License
+
+ISC
