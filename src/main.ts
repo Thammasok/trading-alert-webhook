@@ -159,6 +159,20 @@ app.post('/test', async (_req: Request, res: Response) => {
   }
 })
 
+// ── Keep-alive for Render ──────────────────────────────────────────────────
+const RENDER_URL = process.env.RENDER_URL // ใส่ URL ของตัวเองใน .env
+if (RENDER_URL) {
+  setInterval(
+    async () => {
+      try {
+        await axios.get(`${RENDER_URL}/health`)
+        console.log('🔄 Keep-alive ping')
+      } catch {}
+    },
+    14 * 60 * 1000
+  ) // ทุก 14 นาที
+}
+
 // ── Start ──────────────────────────────────────────────────────────────────
 
 app.listen(parseInt(PORT), () => {

@@ -2,11 +2,11 @@
   "name": "nutz-alert-bot",
   "version": "1.0.0",
   "description": "TradingView → Telegram Alert Bot",
-  "main": "dist/server.js",
+  "main": "dist/main.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn src/server.ts",
+    "dev": "ts-node-dev --respawn src/main.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/main.js"
   },
   "keywords": ["trading", "telegram", "webhook"],
   "author": "Thammasok Nutz",
