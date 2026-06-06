@@ -21,6 +21,10 @@ interface WebhookPayload {
   tp1?: number
   tp2?: number
   timeframe?: string
+  rsi?: number
+  volSpike?: boolean
+  htfTrend?: 'Bullish' | 'Bearish'
+  structure?: 'Bullish' | 'Bearish' | 'Neutral'
   signal?: string
 }
 
@@ -59,6 +63,10 @@ function formatMessage(data: WebhookPayload): string {
     tp1,
     tp2,
     timeframe = '4H',
+    rsi,
+    volSpike,
+    htfTrend,
+    structure,
     signal
   } = data
   const now = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })
@@ -77,6 +85,18 @@ function formatMessage(data: WebhookPayload): string {
     rrText = `\n📐 R:R 1:${rr}`
   }
 
+  // RSI label
+  const rsiLabel =
+    rsi !== undefined
+      ? ` (${rsi >= 70 ? '⚠️ OB' : rsi <= 30 ? '⚠️ OS' : '✅ OK'})`
+      : ''
+
+  // Structure emoji
+  const structureEmoji =
+    structure === 'Bullish' ? '🟢' : structure === 'Bearish' ? '🔴' : '⚪'
+
+  const htfEmoji = htfTrend === 'Bullish' ? '🟢' : '🔴'
+
   let msg = `${emoji} <b>Nutz Signal — ${direction}</b>\n\n`
   msg += `📊 <b>${symbol}</b> | ${timeframe} | ${now}\n`
   msg += `💰 Price: <b>$${Number(price).toLocaleString()}</b>`
@@ -86,6 +106,15 @@ function formatMessage(data: WebhookPayload): string {
   if (tp2) msg += `\n🎯 TP2: <b>$${Number(tp2).toLocaleString()}</b>`
 
   msg += rrText
+
+  // Market context section
+  msg += `\n\n<b>── Market Context ──</b>`
+  if (rsi !== undefined) msg += `\n📈 RSI: <b>${rsi}</b>${rsiLabel}`
+  if (volSpike !== undefined)
+    msg += `\n⚡ Vol Spike: <b>${volSpike ? 'Yes' : 'No'}</b>`
+  if (htfTrend) msg += `\n${htfEmoji} HTF Trend: <b>${htfTrend}</b>`
+  if (structure) msg += `\n${structureEmoji} Structure: <b>${structure}</b>`
+
   if (signal) msg += `\n\n💡 <i>${signal}</i>`
   msg += `\n\n⚠️ ตรวจสอบกราฟก่อนเข้าออเดอร์ทุกครั้ง`
 
@@ -147,6 +176,10 @@ app.post('/test', async (_req: Request, res: Response) => {
     tp1: 80000,
     tp2: 82500,
     timeframe: '4H',
+    rsi: 48.5,
+    volSpike: true,
+    htfTrend: 'Bullish',
+    structure: 'Bullish',
     signal: 'BOS Bullish + Volume Spike'
   }
 
