@@ -124,7 +124,9 @@ function formatMessage(data: WebhookPayload): string {
 // ── Middleware: ตรวจ Secret ────────────────────────────────────────────────
 
 function authMiddleware(req: Request, res: Response, next: NextFunction): void {
-  const secret = req.headers['x-webhook-secret']
+  // รับ secret จาก header หรือ query string (?secret=...)
+  const secret = req.headers['x-webhook-secret'] || req.query['secret']
+
   if (secret !== WEBHOOK_SECRET) {
     res.status(401).json({ error: 'Unauthorized' })
     return
