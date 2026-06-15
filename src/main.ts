@@ -14,6 +14,7 @@ app.use(express.json())
 // ── Types ──────────────────────────────────────────────────────────────────
 
 interface WebhookPayload {
+  secret?: string
   action: 'BUY' | 'SELL' | 'INFO'
   symbol: string
   price: number
@@ -123,17 +124,6 @@ function formatMessage(data: WebhookPayload): string {
 
 // ── Middleware: ตรวจ Secret ────────────────────────────────────────────────
 
-function authMiddleware(req: Request, res: Response, next: NextFunction): void {
-  // รับ secret จาก header หรือ query string (?secret=...)
-  const secret = req.headers['x-webhook-secret'] || req.query['secret']
-
-  if (secret !== WEBHOOK_SECRET) {
-    res.status(401).json({ error: 'Unauthorized' })
-    return
-  }
-  next()
-}
-
 // ── Routes ─────────────────────────────────────────────────────────────────
 
 app.get('/', (_req: Request, res: Response) => {
@@ -144,10 +134,15 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', time: new Date().toISOString() })
 })
 
-// Webhook จาก TradingView
-app.post('/webhook', authMiddleware, async (req: Request, res: Response) => {
+// Webhook จาก TradingView — secret อยู่ใน JSON body
+// URL: https://your-app.onrender.com/webhook (plain, ไม่มี path/query)
+app.post('/webhook', async (req: Request, res: Response) => {
   const data = req.body as WebhookPayload
 
+  if (data.secret !== WEBHOOK_SECRET) {
+    res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
   if (!data.action || !data.symbol || !data.price) {
     res
       .status(400)
